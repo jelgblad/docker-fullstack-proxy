@@ -2,28 +2,31 @@
 
 ## How to use
 
-### Environment variables
+### Configuration
+Configure services with environment variables. `SERVICE1`, `SERVICE2`, `SERVICE3`, `SERVICE...`.
 
-| Variable      | Description                   | Default  |
-| ------------- | ----------------------------- | -------- |
-| SERVICE1_PATH | Service1 proxy path           | /        |
-| SERVICE1_ROUTE| Service1 base route on server | /        |
-| SERVICE1_HOST | Service1 hostname             | frontend |
-| SERVICE1_PORT | Service1 port                 | 3000     |
+| Environment variable | Format                         | Example               |
+| -------------------- | ------------------------------ | --------------------- |
+| `SERVICE1`           | `{path}:{host}:{port}:{route}` | `/api:backend:3000:/` |
 
-| Variable      | Description                   | Default  |
-| ------------- | ----------------------------- | -------- |
-| SERVICE2_PATH | Service2 proxy path           |          |
-| SERVICE2_ROUTE| Service2 base route on server | /        |
-| SERVICE2_HOST | Service2 hostname             |          |
-| SERVICE2_PORT | Service2 port                 |          |
+| Service definition part | Description           | Example   |
+| ----------------------- | --------------------- | --------- |
+| `path`                  | Path on reverse proxy | `/api`    |
+| `host`                  | Service hostname      | `backend` |
+| `port`                  | Service port          | `3000`    |
+| `route`                 | Base route on service | `/`       |
 
-| Variable      | Description                   | Default  |
-| ------------- | ----------------------------- | -------- |
-| SERVICE3_PATH | Service3 proxy path           |          |
-| SERVICE3_ROUTE| Service3 base route on server | /        |
-| SERVICE3_HOST | Service3 hostname             |          |
-| SERVICE3_PORT | Service3 port                 |          |
+## haproxy config
+
+```sh
+frontend http
+  acl url_service1 path_beg "/api"
+  use_backend service1 if url_service1
+
+backend service1
+  server server1 "backend:3000"
+  http-request set-path "%[path,regsub(^/api,/)]"
+```
 
 ## Push to hub.docker.com
 
