@@ -28,6 +28,7 @@ for (( i=1; ; i++ )); do
   # Service backend
   backend="backend service$i\
   \n  server server$i \"${host}:${port}\"\
+  \n  http-request set-path \"%[path,regsub(^${path}/,${route})]\"\
   \n  http-request set-path \"%[path,regsub(^${path},${route})]\""
 
   conditions_output="$conditions_output\n  $condition"
