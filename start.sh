@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# SERVICE1="/api:backend:3000:/api"
-# SERVICE2="/api:backend:3000:/api"
-
 for (( i=1; ; i++ )); do
   n="SERVICE${i}"           # the name of var
   declare -n p="$n"         # reference to the var
@@ -36,8 +33,8 @@ for (( i=1; ; i++ )); do
   backends_output="$backends_output\n$backend"
 done
 
+# Output to haproxy config file
 sed -e "s|<<CONDITIONS>>|${conditions_output}|g" -e "s|<<RULES>>|${rules_output}|g" -e "s|<<BACKENDS>>|${backends_output}|g" haproxy_template.cfg > /usr/local/etc/haproxy/haproxy.cfg
 
-# Start haproxy
-su - haproxy
-haproxy -f /usr/local/etc/haproxy/haproxy.cfg
+# Start haproxy as user "haproxy"
+su -s /bin/bash -c "haproxy -f /usr/local/etc/haproxy/haproxy.cfg" -g haproxy haproxy
