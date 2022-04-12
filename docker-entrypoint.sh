@@ -1,5 +1,25 @@
 #!/bin/bash
 
+set -e
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- haproxy "$@"
+fi
+
+if [ "$1" = 'haproxy' ]; then
+	shift # "haproxy"
+	# if the user wants "haproxy", let's add a couple useful flags
+	#   -W  -- "master-worker mode" (similar to the old "haproxy-systemd-wrapper"; allows for reload via "SIGUSR2")
+	#   -db -- disables background mode
+	set -- haproxy -W -db "$@"
+fi
+
+
+
+
+
+# Generate haproxy config
 for (( i=1; ; i++ )); do
   n="SERVICE${i}"           # the name of var
   declare -n p="$n"         # reference to the var
@@ -34,7 +54,12 @@ for (( i=1; ; i++ )); do
 done
 
 # Output to haproxy config file
-sed -e "s|<<CONDITIONS>>|${conditions_output}|g" -e "s|<<RULES>>|${rules_output}|g" -e "s|<<BACKENDS>>|${backends_output}|g" haproxy_template.cfg > /usr/local/etc/haproxy/haproxy.cfg
+sed -e "s|<<CONDITIONS>>|${conditions_output}|g" -e "s|<<RULES>>|${rules_output}|g" -e "s|<<BACKENDS>>|${backends_output}|g" haproxy_template.cfg > /var/lib/haproxy/haproxy.cfg
 
-# Start haproxy as user "haproxy"
-su -s /bin/bash -c "haproxy -f /usr/local/etc/haproxy/haproxy.cfg" -g haproxy haproxy
+
+
+
+
+
+# Run Docker CMD
+exec "$@"
