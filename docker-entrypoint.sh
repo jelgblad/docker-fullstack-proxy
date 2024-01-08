@@ -46,7 +46,8 @@ for (( i=1; ; i++ )); do
   backend="backend service$i\
   \n  server server$i \"${host}:${port}\"\
   \n  http-request set-path \"%[path,regsub(^${path},${route})]\"\
-  \n  http-request set-path \"%[path,regsub(^//,/)]\""
+  \n  http-request set-path \"%[path,regsub(^//,/)]\"\
+  \n  http-request set-header Host ${host}"
 
   conditions_output="$conditions_output\n  $condition"
   rules_output="$rules_output\n  $rule"
